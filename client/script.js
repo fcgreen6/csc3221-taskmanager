@@ -1,18 +1,42 @@
+// Static elements that the user will interact with.
 const addButton = document.getElementById("addButton");
 const textInput = document.getElementById("textInput");
 const listOutput = document.getElementById("listOutput");
 
-addButton.addEventListener("click", createElement);
+// When the user adds a new task, the value of the text input is sent to the create element function.
+addButton.addEventListener("click", () => {
 
-function createElement() {
+    createElement(textInput.value);
+});
+
+/* This event listener handles any interaction the user has with dynamically generated elements.
+The listener checks if the user has pressed the edit, delete, or complete buttons and calls the necessary function. */
+listOutput.addEventListener("click", (event) => {
+
+    if (event.target.matches(".delete")) {
+
+        event.target.parentNode.remove();
+    }
+});
+
+function createElement(elementValue) {
     
     let elementInnerHTML = `<li>
-    <p>${textInput.value}</p>
+    <p>${elementValue}</p>
     <button type="button" class="delete"></button>
     </li>`;
 
     listOutput.innerHTML += elementInnerHTML;
-
-    const deleteButton = listOutput.lastChild.querySelector(".delete");
 }
 
+function updateDatabase() {
+
+}
+
+function loadData() {
+
+}
+
+function main() {
+    
+}
