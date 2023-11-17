@@ -88,11 +88,12 @@ class coreHTTP {
     }
   }
 
-  async delete(url) {
+  async delete(url, data) {
 
     // Delete request...
     let response = await fetch(url, {
       method: "DELETE",
+      body: data
     });
 
     // Check if there was an error with the request.
