@@ -9,38 +9,35 @@ const listOutput = document.getElementById("listOutput");
 // The information from the database is loaded into this array when the app starts.
 let taskElements = [];
 
-// When the user adds a new task, the value of the text input is sent to the create element function.
-addButton.addEventListener("click", () => {
-
-    createElement(textInput.value);
-});
-
-/* This event listener handles any interaction the user has with dynamically generated elements.
-The listener checks if the user has pressed the edit, delete, or complete buttons and calls the necessary function. */
-listOutput.addEventListener("click", (event) => {
-
-    if (event.target.matches(".delete")) {
-
-        event.target.parentNode.remove();
-    }
-});
-
+// Creates a new element in the HTML doccument.
 function createElement(elementValue, listIndex) {
     
-    let elementInnerHTML = `<div data-index="${listIndex}>
-    <p>${elementValue}</p>
-    <button type="button" class="delete">Delete</button>
+    let elementInnerHTML = `<div data-index="${listIndex}">
+    <p class="task">${elementValue}</p>
     <button type="button" class="complete">Complete</button>
+    <button type="button" class="delete">Delete</button>
     <button type="button" class="edit">Edit</button>
     </div>`;
 
-    listOutput.innerHTML += elementInnerHTML;
+    listOutput.innerHTML = elementInnerHTML + listOutput.innerHTML;
 }
 
-function updateDatabase() {
+// User input disable.
+function disableInput() {
 
+    listOutput.innerHTML = "";
+    addButton.setAttribute("disabled", "");
+    textInput.setAttribute("disabled", "");
 }
 
+// User input enable.
+function enableInput() {
+
+    addButton.removeAttribute("disabled");
+    textInput.removeAttribute("disabled");
+}
+
+// Gets all documents from the database and creates the taskElements array.
 async function loadData() {
 
     await http.get("/tm/tasks");
@@ -51,21 +48,178 @@ async function loadData() {
     }
     else {
 
-        // Elements from the database are added to an array and are only loaded from the database when it is first started.
+        // Elements from the database are added to the taskElements array.
         let dbResponse = JSON.parse(http.content);
         taskElements = dbResponse.tasksAll;
         
         for (let i = 0; i < taskElements.length; i++) {
             
-            createElement(taskElements[i].name, taskElements[i]);
+            createElement(taskElements[i].name, i);
         }
     }
 }
 
+// Sends a post request to the server based on the the selected element in the taskElements array.
+async function postData(newElement) {
+
+    disableInput();
+
+    await http.post("/tm/tasks", JSON.stringify(newElement));
+
+    if (http.error) {
+
+        console.log(http.content);
+    }
+    else {
+
+        await loadData();
+    }
+
+    enableInput();
+}
+
+// Sends a put request to the server based on the selected element in the taskElements array.
+async function updateData(elementIndex) {
+
+    disableInput();
+
+    await http.put("/tm/tasks", JSON.stringify(taskElements[elementIndex]));
+
+    if (http.error) {
+
+        console.log(http.content);
+    }
+    else {
+
+        await loadData();
+    }
+
+    enableInput();
+}
+
+// Sends a delete request to the server based on the the selected element in the taskElements array.
+async function deleteData(elementIndex) {
+
+    disableInput();
+
+    await http.delete(`/tm/tasks/${taskElements[elementIndex]._id}`);
+
+    if (http.error) {
+
+        console.log(http.content);
+    }
+    else {
+
+        await loadData();
+    }
+
+    enableInput();
+}
+
+async function addButtonAndEnter() {
+
+    // If the update data member of the add button is populated it means that the element at that index is being updated.
+    if (addButton.dataset.update) {
+
+        // If the user tries to update with an empty string they delete the task. (There is no task left!)
+        if (textInput.value === "") {
+
+            await deleteData(addButton.dataset.update);
+            return;
+        }
+
+        // The updated information is updated in the database.
+        taskElements[addButton.dataset.update].name = textInput.value;
+        await updateData(addButton.dataset.update);
+
+        // The add button regains its original functionality.
+        addButton.innerHTML = "Add";
+        addButton.dataset.update = "";
+    }
+    else if (textInput.value !== "") {
+
+        // A new element is added to the database and the tasks are refreshed.
+        listOutput.innerHTML = "";
+        await postData({name: textInput.value, completed: false});
+    }
+
+    textInput.value = "";
+}
+
+// addButtonAndEnter function is called when the add button is clicked.
+addButton.addEventListener("click", () => {
+    
+    addButtonAndEnter();
+});
+
+// addButtonAndEnter function is called whenever the enter button is clicked.
+textInput.addEventListener("keydown", async (event) => {
+
+    if (event.key === "Enter") {
+
+        addButtonAndEnter();
+    }
+});
+
+/**
+ * This event listener listens for events within all dynamically created data. Different functions are applied based on
+ * which class of object is interacted with.
+ */
+listOutput.addEventListener("click", async (event) => {
+
+    // The whole HTML element that is impacted.
+    const element = event.target.parentNode;
+
+    // The specific target element within the parent element.
+    const targetChild = event.target;
+
+    // User defined value of the element.
+    const elementValue = element.querySelector(".task").innerHTML;
+
+    // The index of the object representation of the element in the taskElements list.
+    const elementIndex = element.dataset.index;
+
+    if (targetChild.matches(".delete")) {
+
+        // If a delete button is clicked the associated task is deleted.
+        listOutput.innerHTML = "";
+        await deleteData(elementIndex);
+
+        textInput.value = "";
+    }
+    else if (targetChild.matches(".edit")) {
+
+        if (addButton.dataset.update) {
+
+            // Return if an object is already being edited.
+            return;
+        }
+        else {
+            
+            /* If the edit button is clicked a placeholder object is created and the information to be edited is sent to
+            the input box. */
+            element.innerHTML = `<p>Editing...</p>`;
+            textInput.value = elementValue;
+            addButton.innerHTML = "Save";
+            addButton.dataset.update = elementIndex;
+        }
+    }
+    else if (targetChild.matches(".complete")) {
+
+        // When the complete button is clicked the task completion is changed to the opposite value.
+        taskElements[elementIndex].completed = !(taskElements[elementIndex].completed);
+        await updateData(elementIndex);
+
+        textInput.value = "";
+    }
+});
+
+// Data from the server is loaded when the app is initially started.
 async function main() {
     
+    disableInput();
     await loadData();
-    console.log("done");
+    enableInput();
 }
 
 main();

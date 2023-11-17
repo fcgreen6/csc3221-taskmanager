@@ -9,10 +9,6 @@ const taskSchema = new mongoose.Schema({
     completed: {
       type: Boolean,
       default: false
-    },
-    clientIndex: {
-        type: Number,
-        required: [true, "must provide an index number"]
     }
 });
 

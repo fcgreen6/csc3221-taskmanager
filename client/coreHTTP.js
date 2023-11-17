@@ -47,6 +47,7 @@ class coreHTTP {
     // Post request...
     let response = await fetch(url, {
       method: "POST",
+      headers: {"Content-Type": "application/json"},
       body: data
     });
 
@@ -70,6 +71,7 @@ class coreHTTP {
     // Put request...
     let response = await fetch(url, {
       method: "PUT",
+      headers: {"Content-Type": "application/json"},
       body: data
     });
 
@@ -88,12 +90,11 @@ class coreHTTP {
     }
   }
 
-  async delete(url, data) {
+  async delete(url) {
 
     // Delete request...
     let response = await fetch(url, {
-      method: "DELETE",
-      body: data
+      method: "DELETE"
     });
 
     // Check if there was an error with the request.
