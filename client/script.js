@@ -10,14 +10,28 @@ const listOutput = document.getElementById("listOutput");
 let taskElements = [];
 
 // Creates a new element in the HTML doccument.
-function createElement(elementValue, listIndex) {
-    
-    let elementInnerHTML = `<div data-index="${listIndex}">
-    <p class="task">${elementValue}</p>
-    <button type="button" class="complete">Complete</button>
-    <button type="button" class="delete">Delete</button>
-    <button type="button" class="edit">Edit</button>
-    </div>`;
+function createElement(element, listIndex) {
+
+    let elementInnerHTML;
+
+    if (element.completed === true) {
+
+        elementInnerHTML = `<div data-index="${listIndex}">
+        <input type="checkbox" class = complete checked>
+        <p class="task" style="text-decoration-line: line-through">${element.name}</p>
+        <button type="button" class="delete">Delete</button>
+        <button type="button" class="edit">Edit</button>
+        </div>`;
+    }
+    else {
+
+        elementInnerHTML = `<div data-index="${listIndex}">
+        <input type="checkbox" class = complete>
+        <p class="task">${element.name}</p>
+        <button type="button" class="delete">Delete</button>
+        <button type="button" class="edit">Edit</button>
+        </div>`;
+    }
 
     listOutput.innerHTML = elementInnerHTML + listOutput.innerHTML;
 }
@@ -54,7 +68,7 @@ async function loadData() {
         
         for (let i = 0; i < taskElements.length; i++) {
             
-            createElement(taskElements[i].name, i);
+            createElement(taskElements[i], i);
         }
     }
 }
@@ -125,6 +139,9 @@ async function addButtonAndEnter() {
         if (textInput.value === "") {
 
             await deleteData(addButton.dataset.update);
+            addButton.removeAttribute("style");
+            addButton.value = "Add";
+            addButton.dataset.update = "";
             return;
         }
 
@@ -133,7 +150,8 @@ async function addButtonAndEnter() {
         await updateData(addButton.dataset.update);
 
         // The add button regains its original functionality.
-        addButton.innerHTML = "Add";
+        addButton.removeAttribute("style");
+        addButton.value = "Add";
         addButton.dataset.update = "";
     }
     else if (textInput.value !== "") {
@@ -189,20 +207,12 @@ listOutput.addEventListener("click", async (event) => {
     }
     else if (targetChild.matches(".edit")) {
 
-        if (addButton.dataset.update) {
-
-            // Return if an object is already being edited.
-            return;
-        }
-        else {
-            
-            /* If the edit button is clicked a placeholder object is created and the information to be edited is sent to
-            the input box. */
-            element.innerHTML = `<p>Editing...</p>`;
+            /* If the edit button is clicked all tasks are temporaraly removed so that the user does not interact with them. */
+            listOutput.innerHTML = `<p class="task">Updating Task: "${elementValue}"</p>`;
             textInput.value = elementValue;
-            addButton.innerHTML = "Save";
+            addButton.style = "background-color: #122be6";
+            addButton.value = "Save";
             addButton.dataset.update = elementIndex;
-        }
     }
     else if (targetChild.matches(".complete")) {
 

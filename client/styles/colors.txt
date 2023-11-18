@@ -1,7 +1,0 @@
-0cb32b green
-
-e61212 red
-
-122be6 blue
-
-dde02b yellow

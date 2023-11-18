@@ -26,7 +26,6 @@ h1 {
 #textInput {
 
     margin-top: 20px;
-    margin-right: 0px;
     width: 45vw;
     height: 30px;
     border-style: solid;
@@ -53,15 +52,46 @@ h1 {
 #listOutput {
 
     padding-top: 155px;
-    align-items: center;
+    position: static;
+    align-items: right;
+    text-align: center
 
+}
+
+#listOutput div {
+
+    margin: 40px;
 }
 
 .task {
 
+    display: inline-block;
     font-size: 25px;
     width: 50vw;
     border-bottom-style: solid;
     border-width: 1px;
     border-color: white;
+}
+
+.complete {
+
+    background-color: #0cb32b;
+    height: 30px;
+    width: 30px;
+}
+
+.edit {
+
+    background-color: #122be6;
+}
+
+.delete {
+
+    background-color: #e61212;
+}
+
+.refresh {
+
+    color: black;
+    background-color: #dde02b
 }
