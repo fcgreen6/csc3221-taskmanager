@@ -1,0 +1,67 @@
+* {
+    margin: 0px;
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    background-color: black;
+}
+
+.appForm {
+
+    position: fixed;
+    align-items: center;
+    border-color: white;
+    border-bottom-style: solid;
+    width: 100vw;
+    height: 20vh;
+    min-height: 125px;
+    max-height: 145px;
+}
+
+h1 {
+    
+    font-size: 50px;
+}
+
+#textInput {
+
+    margin-top: 20px;
+    margin-right: 0px;
+    width: 45vw;
+    height: 30px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    justify-content: left;
+    text-align: left;
+    font-size: 20px;
+}
+
+#addButton {
+
+    margin-top: 20px;
+    width: 80px;
+    height: 33px;
+    border-width: 1px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    font-size: 20px;
+    background-color: #0cb32b;
+}
+
+#listOutput {
+
+    padding-top: 155px;
+    align-items: center;
+
+}
+
+.task {
+
+    font-size: 25px;
+    width: 50vw;
+    border-bottom-style: solid;
+    border-width: 1px;
+    border-color: white;
+}
